@@ -9,7 +9,7 @@ specifiers:
   eslint: ^7.32.0
   eslint-config-prettier: ^8.3.0
   eslint-plugin-svelte3: ^3.2.1
-  houdini: ^0.13.2-alpha.0
+  houdini: ^0.13.2-alpha.2
   houdini-preprocess: ^0.13.2-alpha.0
   prettier: ^2.5.1
   prettier-plugin-svelte: ^2.5.0
@@ -31,7 +31,7 @@ devDependencies:
   eslint: 7.32.0
   eslint-config-prettier: 8.5.0_eslint@7.32.0
   eslint-plugin-svelte3: 3.4.1_eslint@7.32.0+svelte@3.46.4
-  houdini: 0.13.2-alpha.0
+  houdini: 0.13.2-alpha.2
   houdini-preprocess: 0.13.2-alpha.0
   prettier: 2.6.1
   prettier-plugin-svelte: 2.6.0_prettier@2.6.1+svelte@3.46.4
@@ -87,17 +87,6 @@ packages:
       - supports-color
     dev: true
 
-  /@graphql-tools/merge/6.2.17_graphql@15.5.0:
-    resolution: {integrity: sha512-G5YrOew39fZf16VIrc49q3c8dBqQDD0ax5LYPiNja00xsXDi0T9zsEWVt06ApjtSdSF6HDddlu5S12QjeN8Tow==}
-    peerDependencies:
-      graphql: ^14.0.0 || ^15.0.0
-    dependencies:
-      '@graphql-tools/schema': 8.3.5_graphql@15.5.0
-      '@graphql-tools/utils': 8.0.2_graphql@15.5.0
-      graphql: 15.5.0
-      tslib: 2.3.1
-    dev: true
-
   /@graphql-tools/merge/6.2.17_graphql@15.8.0:
     resolution: {integrity: sha512-G5YrOew39fZf16VIrc49q3c8dBqQDD0ax5LYPiNja00xsXDi0T9zsEWVt06ApjtSdSF6HDddlu5S12QjeN8Tow==}
     peerDependencies:
@@ -109,16 +98,6 @@ packages:
       tslib: 2.3.1
     dev: true
 
-  /@graphql-tools/merge/8.2.6_graphql@15.5.0:
-    resolution: {integrity: sha512-dkwTm4czMISi/Io47IVvq2Fl9q4TIGKpJ0VZjuXYdEFkECyH6A5uwxZfPVandZG+gQs8ocFFoa6RisiUJLZrJw==}
-    peerDependencies:
-      graphql: ^14.0.0 || ^15.0.0 || ^16.0.0
-    dependencies:
-      '@graphql-tools/utils': 8.6.5_graphql@15.5.0
-      graphql: 15.5.0
-      tslib: 2.3.1
-    dev: true
-
   /@graphql-tools/merge/8.2.6_graphql@15.8.0:
     resolution: {integrity: sha512-dkwTm4czMISi/Io47IVvq2Fl9q4TIGKpJ0VZjuXYdEFkECyH6A5uwxZfPVandZG+gQs8ocFFoa6RisiUJLZrJw==}
     peerDependencies:
@@ -127,18 +106,6 @@ packages:
       '@graphql-tools/utils': 8.6.5_graphql@15.8.0
       graphql: 15.8.0
       tslib: 2.3.1
-    dev: true
-
-  /@graphql-tools/schema/8.3.5_graphql@15.5.0:
-    resolution: {integrity: sha512-3mJ/K7TdL+fnEUtCUqF4qkh1fcNMzaxgwKgO9fSYSTS7zyT16hbi5XSulSTshygHgaD2u+MO588iR4ZJcbZcIg==}
-    peerDependencies:
-      graphql: ^14.0.0 || ^15.0.0 || ^16.0.0
-    dependencies:
-      '@graphql-tools/merge': 8.2.6_graphql@15.5.0
-      '@graphql-tools/utils': 8.6.5_graphql@15.5.0
-      graphql: 15.5.0
-      tslib: 2.3.1
-      value-or-promise: 1.0.11
     dev: true
 
   /@graphql-tools/schema/8.3.5_graphql@15.8.0:
@@ -153,30 +120,12 @@ packages:
       value-or-promise: 1.0.11
     dev: true
 
-  /@graphql-tools/utils/8.0.2_graphql@15.5.0:
-    resolution: {integrity: sha512-gzkavMOgbhnwkHJYg32Adv6f+LxjbQmmbdD5Hty0+CWxvaiuJq+nU6tzb/7VSU4cwhbNLx/lGu2jbCPEW1McZQ==}
-    peerDependencies:
-      graphql: ^14.0.0 || ^15.0.0
-    dependencies:
-      graphql: 15.5.0
-      tslib: 2.3.1
-    dev: true
-
   /@graphql-tools/utils/8.0.2_graphql@15.8.0:
     resolution: {integrity: sha512-gzkavMOgbhnwkHJYg32Adv6f+LxjbQmmbdD5Hty0+CWxvaiuJq+nU6tzb/7VSU4cwhbNLx/lGu2jbCPEW1McZQ==}
     peerDependencies:
       graphql: ^14.0.0 || ^15.0.0
     dependencies:
       graphql: 15.8.0
-      tslib: 2.3.1
-    dev: true
-
-  /@graphql-tools/utils/8.6.5_graphql@15.5.0:
-    resolution: {integrity: sha512-mjOtaWiS2WIqRz/cq5gaeM3sVrllcu2xbtHROw1su1v3xWa3D3dKgn8Lrl7+tvWs5WUVySsBss/VZ3WdoPkCrA==}
-    peerDependencies:
-      graphql: ^14.0.0 || ^15.0.0 || ^16.0.0
-    dependencies:
-      graphql: 15.5.0
       tslib: 2.3.1
     dev: true
 
@@ -1285,13 +1234,13 @@ packages:
       function-bind: 1.1.1
     dev: true
 
-  /houdini-common/0.12.1_graphql@15.5.0:
+  /houdini-common/0.12.1_graphql@15.8.0:
     resolution: {integrity: sha512-KnNibwAFBszbx5LrFkEeZyENVcXu/SZ5Pp55RIFfTqxZXm2XmgvXQy+gHtjwjylbMH9fUQplvsUYZ7fySV2dnA==}
     peerDependencies:
       graphql: ^15.x
     dependencies:
       '@babel/parser': 7.17.8
-      graphql: 15.5.0
+      graphql: 15.8.0
       mkdirp: 1.0.4
     dev: true
 
@@ -1339,14 +1288,14 @@ packages:
     engines: {node: '>=14.13'}
     hasBin: true
     dependencies:
-      '@graphql-tools/merge': 6.2.17_graphql@15.5.0
+      '@graphql-tools/merge': 6.2.17_graphql@15.8.0
       '@types/inquirer': 7.3.3
       babylon: 7.0.0-beta.47
       commander: 7.2.0
       estree-walker: 2.0.2
       glob: 7.2.0
-      graphql: 15.5.0
-      houdini-common: 0.12.1_graphql@15.5.0
+      graphql: 15.8.0
+      houdini-common: 0.12.1_graphql@15.8.0
       inquirer: 7.3.3
       mkdirp: 1.0.4
       node-fetch: 2.6.7
@@ -1358,8 +1307,8 @@ packages:
       - rollup
     dev: true
 
-  /houdini/0.13.2-alpha.0:
-    resolution: {integrity: sha512-U3xE7bbkvsoUrf58IvSlOzelnHuhSpJr0G63boCkSSE+Eo0dX+Bk5MnqKb6vBlLVui/jXjbhf6loju+ls4f8Fg==}
+  /houdini/0.13.2-alpha.2:
+    resolution: {integrity: sha512-NH4TG9WCzU7z0bDmjgvgHbcbt4L3k8OG2mkihlqtulIkRm8ZE+3LZ7gO+KLqAyR6F6722tnFp5i+hQIoF/dA8g==}
     engines: {node: '>=14.13'}
     hasBin: true
     dependencies:

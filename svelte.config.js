@@ -1,10 +1,12 @@
 import 'dotenv/config';
 import houdini from 'houdini-preprocess';
+import preprocess from 'svelte-preprocess';
+
 import path from 'path';
 import { replaceCodePlugin } from 'vite-plugin-replace';
 
 export default {
-	preprocess: [houdini()],
+	preprocess: [preprocess(), houdini()],
 
 	kit: {
 		vite: {
