@@ -17,10 +17,7 @@ export declare class Cache {
         layer?: LayerID;
         applyUpdates?: boolean;
     }): LayerID;
-    read(...args: Parameters<CacheInternal['getSelection']>): {
-        data: GraphQLObject;
-        partial: boolean;
-    };
+    read(...args: Parameters<CacheInternal['getSelection']>): GraphQLObject;
     subscribe(spec: SubscriptionSpec, variables?: {}): void;
     unsubscribe(spec: SubscriptionSpec, variables?: {}): void;
     list(name: string, parentID?: string): List;
@@ -60,10 +57,7 @@ declare class CacheInternal {
         selection: SubscriptionSelection;
         parent?: string;
         variables?: {};
-    }): {
-        data: GraphQLObject | null;
-        partial: boolean;
-    };
+    }): GraphQLObject | null;
     id(type: string, data: {
         id?: string;
     } | null): string | null;
@@ -76,10 +70,7 @@ declare class CacheInternal {
         fields: SubscriptionSelection;
         variables?: {};
         linkedList: LinkedList;
-    }): {
-        data: LinkedList<GraphQLValue>;
-        partial: boolean;
-    };
+    }): LinkedList<GraphQLValue>;
     extractNestedListIDs({ value, abstract, recordID, key, linkedType, fields, variables, applyUpdates, specs, layer, startingWith, }: {
         value: GraphQLValue[];
         recordID: string;
@@ -96,6 +87,7 @@ declare class CacheInternal {
         nestedIDs: LinkedList;
         newIDs: (string | null)[];
     };
+    isDataAvailable(target: SubscriptionSelection, variables: {}, parentID?: string): boolean;
     collectGarbage(): void;
 }
 export declare const rootID = "_ROOT_";

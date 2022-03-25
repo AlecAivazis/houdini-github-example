@@ -36,7 +36,7 @@ export class Cache {
                     parent: spec.parentID || rootID,
                     selection: spec.selection,
                     variables: ((_a = spec.variables) === null || _a === void 0 ? void 0 : _a.call(spec)) || {},
-                }).data);
+                }));
             }
         }
         // return the id to the caller so they can resolve the layer if it was optimistic
@@ -154,20 +154,6 @@ class CacheInternal {
                 // write value to the layer
                 layer.writeField(parent, key, newValue);
             }
-            // if we are writing `null` over a link
-            else if (value === null) {
-                // if the previous value was also null, there's nothing to do
-                if (previousValue === null) {
-                    continue;
-                }
-                const previousLinks = flattenList([previousValue]);
-                for (const link of previousLinks) {
-                    this.subscriptions.remove(link, fields, currentSubcribers, variables);
-                }
-                layer.writeLink(parent, key, null);
-                // add the list of subscribers for this field
-                toNotify.push(...currentSubcribers);
-            }
             // the field could point to a linked object
             else if (value instanceof Object && !Array.isArray(value)) {
                 // the previous value is a string holding the id of the object to link to
@@ -193,18 +179,12 @@ class CacheInternal {
                 layer.writeLink(parent, key, linkedID);
                 // if the link target of this field changed and it was responsible for the current subscription
                 if (linkedID && displayLayer && linkChange) {
-                    // we need to clear the subscriptions in the previous link
-                    // and add them to the new link
+                    // if there was an old subscriber we are forgotten
                     if (previousValue && typeof previousValue === 'string') {
                         this.subscriptions.remove(previousValue, fields, currentSubcribers, variables);
                     }
-                    // copy the subscribers to the new value
-                    this.subscriptions.addMany({
-                        parent: linkedID,
-                        selection: fields,
-                        subscribers: currentSubcribers,
-                        variables,
-                    });
+                    // we need to clear the subscriptions in the previous link
+                    // and add them to the new link
                     toNotify.push(...currentSubcribers);
                 }
                 // if the link target points to another record in the cache we need to walk down its
@@ -339,8 +319,11 @@ class CacheInternal {
                 // is still valid would not be triggered
                 const contentChanged = JSON.stringify(linkedIDs) !== JSON.stringify(oldIDs);
                 // we need to look at the last time we saw each subscriber to check if they need to be added to the spec
-                if (contentChanged) {
-                    toNotify.push(...currentSubcribers);
+                for (const subscriber of currentSubcribers) {
+                    // if either are true, add the subscriber to the list
+                    if (contentChanged) {
+                        toNotify.push(subscriber);
+                    }
                 }
                 // any ids that don't show up in the new list need to have their subscribers wiped
                 for (const lostID of oldIDs) {
@@ -353,18 +336,6 @@ class CacheInternal {
                 if (contentChanged || (oldIDs.length === 0 && newIDs.length === 0)) {
                     // update the cached value
                     layer.writeLink(parent, key, linkedIDs);
-                }
-                // every new id that isn't a prevous relationship needs a new subscriber
-                for (const id of newIDs.filter((id) => !oldIDs.includes(id))) {
-                    if (id == null) {
-                        continue;
-                    }
-                    this.subscriptions.addMany({
-                        parent: id,
-                        selection: fields,
-                        subscribers: currentSubcribers,
-                        variables,
-                    });
                 }
             }
             // handle any operations relative to this node
@@ -387,7 +358,7 @@ class CacheInternal {
                 // there could be a list of elements to perform the operation on
                 const targets = Array.isArray(value) ? value : [value];
                 for (const target of targets) {
-                    // insert an object into a list
+                    // only insert an object into a list if we're adding an object with fields
                     if (operation.action === 'insert' &&
                         target instanceof Object &&
                         fields &&
@@ -397,7 +368,7 @@ class CacheInternal {
                             .when(operation.when)
                             .addToList(fields, target, variables, operation.position || 'last');
                     }
-                    // remove object from list
+                    // only insert an object into a list if we're adding an object with fields
                     else if (operation.action === 'remove' &&
                         target instanceof Object &&
                         fields &&
@@ -407,7 +378,7 @@ class CacheInternal {
                             .when(operation.when)
                             .remove(target, variables);
                     }
-                    // delete the target
+                    // delete the target if we have to
                     else if (operation.action === 'delete' && operation.type) {
                         if (typeof target !== 'string') {
                             throw new Error('Cannot delete a record with a non-string ID');
@@ -439,36 +410,21 @@ class CacheInternal {
         var _a, _b;
         // we could be asking for values of null
         if (parent === null) {
-            return { data: null, partial: false };
+            return null;
         }
         const target = {};
-        // we need to track if we have a partial data set which means we have _something_ but not everything
-        let hasData = false;
-        // if we run into a single missing value we will flip this since it means we have a partial result
-        let partial = false;
-        // if we get an empty value for a non-null field, we need to turn the whole object null
-        // that happens after we process every field to determine if its a partial null
-        let cascadeNull = false;
         // look at every field in the parentFields
-        for (const [attributeName, { type, keyRaw, fields, nullable }] of Object.entries(selection)) {
+        for (const [attributeName, { type, keyRaw, fields }] of Object.entries(selection)) {
             const key = evaluateKey(keyRaw, variables);
             // look up the value in our store
             const { value } = this.storage.get(parent, key);
-            // if we dont have a value, we know this result is going to be partial
-            if (typeof value === 'undefined') {
-                partial = true;
-            }
-            // as long as the value is not undefined, we have something
-            else {
-                hasData = true;
-            }
-            // if we dont have a value to return, use null (we check for non-null fields at the end)
-            if (typeof value === 'undefined' || value === null) {
-                // set the value to null
+            // if the value is null
+            if (value === null) {
                 target[attributeName] = null;
+                continue;
             }
             // if the field is a scalar
-            else if (!fields) {
+            if (!fields) {
                 // is the type a custom scalar with a specified unmarshal function
                 if ((_b = (_a = this.config.scalars) === null || _a === void 0 ? void 0 : _a[type]) === null || _b === void 0 ? void 0 : _b.unmarshal) {
                     // pass the primitive value to the unmarshal function
@@ -478,49 +434,32 @@ class CacheInternal {
                 else {
                     target[attributeName] = value;
                 }
+                // we're done
+                continue;
             }
             // if the field is a list of records
             else if (Array.isArray(value)) {
                 // the linked list could be a deeply nested thing, we need to call getData for each record
-                const listValue = this.hydrateNestedList({
+                target[attributeName] = this.hydrateNestedList({
                     fields,
                     variables,
                     linkedList: value,
                 });
-                // save the hydrated list
-                target[attributeName] = listValue.data;
-                // the linked value could have partial results
-                if (listValue.partial) {
-                    partial = true;
-                }
             }
-            // otherwise the field is a linked object
+            // otherwise the field is an object
             else {
-                // look up the related object fields
-                const objectFields = this.getSelection({
-                    parent: value,
-                    selection: fields,
-                    variables,
-                });
-                // save the object value
-                target[attributeName] = objectFields.data;
-                // the linked value could have partial results
-                if (objectFields.partial) {
-                    partial = true;
-                }
-            }
-            // regardless of how the field was processed, if we got a null value assigned
-            // and the field is not nullable, we need to cascade up
-            if (target[attributeName] === null && !nullable) {
-                cascadeNull = true;
+                // if we dont have a value, use null
+                target[attributeName] = !value
+                    ? null
+                    : this.getSelection({
+                        parent: value,
+                        selection: fields,
+                        variables,
+                    });
+                continue;
             }
         }
-        return {
-            data: cascadeNull ? null : target,
-            // our value is considered true if there is some data but not everything
-            // has a full value
-            partial: hasData && partial,
-        };
+        return target;
     }
     id(type, data) {
         // try to compute the id of the record
@@ -541,35 +480,18 @@ class CacheInternal {
         // the linked list could be a deeply nested thing, we need to call getData for each record
         // we can't mutate the lists because that would change the id references in the listLinks map
         // to the corresponding record. can't have that now, can we?
-        const result = [];
-        let partialData = false;
-        for (const entry of linkedList) {
+        return linkedList.map((entry) => {
             // if the entry is an array, keep going
             if (Array.isArray(entry)) {
-                const nestedValue = this.hydrateNestedList({ fields, variables, linkedList: entry });
-                result.push(nestedValue.data);
-                if (nestedValue.partial) {
-                    partialData = true;
-                }
-                continue;
+                return this.hydrateNestedList({ fields, variables, linkedList: entry });
             }
             // the entry could be null
             if (entry === null) {
-                result.push(entry);
-                continue;
+                return entry;
             }
             // look up the data for the record
-            const { data, partial } = this.getSelection({
-                parent: entry,
-                selection: fields,
-                variables,
-            });
-            result.push(data);
-            if (partial) {
-                partialData = true;
-            }
-        }
-        return { data: result, partial: partialData };
+            return this.getSelection({ parent: entry, selection: fields, variables });
+        });
     }
     extractNestedListIDs({ value, abstract, recordID, key, linkedType, fields, variables, applyUpdates, specs, layer, startingWith, }) {
         var _a;
@@ -649,6 +571,56 @@ class CacheInternal {
             nestedIDs[i] = linkedID;
         }
         return { newIDs, nestedIDs };
+    }
+    isDataAvailable(target, variables, parentID = rootID) {
+        // if the cache is disabled we dont have to look at anything else
+        if (this._disabled) {
+            return false;
+        }
+        // every field in the selection needs to be present
+        for (const selection of Object.values(target)) {
+            const fieldName = evaluateKey(selection.keyRaw, variables);
+            // look up the field value
+            const { value, kind } = this.storage.get(parentID, fieldName);
+            // if the field is a scalar and has a value, we're good (no need to check a subselection)
+            if (kind === 'scalar' && typeof value !== 'undefined') {
+                continue;
+            }
+            // if the field has no value and there are no subselections and we dont have a value, we are missing data
+            else if (!selection.fields) {
+                return false;
+            }
+            // the link could be an object
+            else if (!Array.isArray(value)) {
+                // if we have a null value we're good
+                if (value === null) {
+                    continue;
+                }
+                // if we have a valid id, walk down
+                if (!this.isDataAvailable(selection.fields, variables, value)) {
+                    return false;
+                }
+            }
+            // the link is a list
+            else {
+                // we need to look at every linked record
+                for (const linkedRecord of flattenList(value)) {
+                    if (!linkedRecord) {
+                        continue;
+                    }
+                    // if the linked record doesn't have the field then we are missing data
+                    if (!this.isDataAvailable(selection.fields, variables, linkedRecord)) {
+                        return false;
+                    }
+                }
+            }
+            // if we dont have a linked record or linked list, we dont have the data
+            if (typeof value === 'undefined') {
+                return false;
+            }
+        }
+        // if we got this far, we have the information
+        return true;
     }
     collectGarbage() {
         // increment the lifetimes of unused data

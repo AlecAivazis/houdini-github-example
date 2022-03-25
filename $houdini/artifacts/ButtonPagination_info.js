@@ -16,8 +16,7 @@ export default {
     selection: {
         startCursor: {
             type: "String",
-            keyRaw: "startCursor",
-            nullable: true
+            keyRaw: "startCursor"
         },
 
         hasPreviousPage: {
@@ -32,8 +31,7 @@ export default {
 
         endCursor: {
             type: "String",
-            keyRaw: "endCursor",
-            nullable: true
+            keyRaw: "endCursor"
         }
     }
 };

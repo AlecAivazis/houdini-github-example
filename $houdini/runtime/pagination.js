@@ -21,12 +21,9 @@ export function paginatedQuery(document) {
         throw new Error('paginatedQuery must be passed a query with @paginate.');
     }
     // pass the artifact to the base query operation
-    const { data, loading, refetch, partial, ...restOfQueryResponse } = query(document);
-    const paginationPartial = writable(false);
-    const partialStore = derived([partial, paginationPartial], ([$partial, $paginationPartial]) => $partial || $paginationPartial);
+    const { data, loading, refetch, ...restOfQueryResponse } = query(document);
     return {
         data,
-        partial: partialStore,
         ...paginationHandlers({
             initialValue: document.initialValue.data,
             store: data,
@@ -34,7 +31,6 @@ export function paginatedQuery(document) {
             queryVariables: () => document.variables,
             documentLoading: loading,
             refetch,
-            partial: paginationPartial,
         }),
         ...restOfQueryResponse,
     };
@@ -55,11 +51,9 @@ export function paginatedFragment(document, initialValue) {
     const paginationArtifact = 
     // @ts-ignore: typing esm/cjs interop is hard
     document.paginationArtifact.default || document.paginationArtifact;
-    const partial = writable(false);
     return {
         data,
         ...paginationHandlers({
-            partial,
             initialValue,
             store: data,
             artifact: paginationArtifact,
@@ -71,7 +65,7 @@ export function paginatedFragment(document, initialValue) {
         }),
     };
 }
-function paginationHandlers({ initialValue, artifact, store, queryVariables, documentLoading, refetch, partial, }) {
+function paginationHandlers({ initialValue, artifact, store, queryVariables, documentLoading, refetch, }) {
     var _a;
     // start with the defaults and no meaningful page info
     let loadPreviousPage = defaultLoadPreviousPage;
@@ -95,7 +89,6 @@ function paginationHandlers({ initialValue, artifact, store, queryVariables, doc
             queryVariables,
             loading: paginationLoadingState,
             refetch,
-            partial,
         });
         // always track pageInfo
         pageInfo = cursor.pageInfo;
@@ -119,7 +112,6 @@ function paginationHandlers({ initialValue, artifact, store, queryVariables, doc
             loading: paginationLoadingState,
             refetch,
             store,
-            partial,
         });
         loadNextPage = offset.loadPage;
         refetchQuery = offset.refetch;
@@ -132,7 +124,7 @@ function paginationHandlers({ initialValue, artifact, store, queryVariables, doc
     const loading = derived([paginationLoadingState, documentLoading], ($loadingStates) => $loadingStates[0] || $loadingStates[1]);
     return { loadNextPage, loadPreviousPage, pageInfo, loading, refetch: refetchQuery };
 }
-function cursorHandlers({ initialValue, artifact, store, queryVariables: extraVariables, loading, refetch, partial, }) {
+function cursorHandlers({ initialValue, artifact, store, queryVariables: extraVariables, loading, refetch, }) {
     // pull out the context accessors
     const variables = getVariables();
     const sessionStore = getSession();
@@ -167,8 +159,7 @@ function cursorHandlers({ initialValue, artifact, store, queryVariables: extraVa
             throw missingPageSizeError(functionName);
         }
         // send the query
-        const { result, partial: partialData } = await executeQuery(artifact, queryVariables, sessionStore, false);
-        partial.set(partialData);
+        const result = await executeQuery(artifact, queryVariables, sessionStore, false);
         // if the query is embedded in a node field (paginated fragments)
         // make sure we look down one more for the updated page info
         const resultPath = [...artifact.refetch.path];
@@ -254,8 +245,7 @@ function cursorHandlers({ initialValue, artifact, store, queryVariables: extraVa
             // set the loading state to true
             loading.set(true);
             // send the query
-            const { result, partial: partialData } = await executeQuery(artifact, queryVariables, sessionStore, false);
-            partial.set(partialData);
+            const result = await executeQuery(artifact, queryVariables, sessionStore, false);
             // update cache with the result
             cache.write({
                 selection: artifact.selection,
@@ -269,7 +259,7 @@ function cursorHandlers({ initialValue, artifact, store, queryVariables: extraVa
         },
     };
 }
-function offsetPaginationHandler({ artifact, queryVariables: extraVariables, loading, refetch, initialValue, store, partial, }) {
+function offsetPaginationHandler({ artifact, queryVariables: extraVariables, loading, refetch, initialValue, store, }) {
     var _a;
     // we need to track the most recent offset for this handler
     let currentOffset = ((_a = artifact.refetch) === null || _a === void 0 ? void 0 : _a.start) || 0;
@@ -300,8 +290,7 @@ function offsetPaginationHandler({ artifact, queryVariables: extraVariables, loa
             // set the loading state to true
             loading.set(true);
             // send the query
-            const { result, partial: partialData } = await executeQuery(artifact, queryVariables, sessionStore, false);
-            partial.set(partialData);
+            const result = await executeQuery(artifact, queryVariables, sessionStore, false);
             // update cache with the result
             cache.write({
                 selection: artifact.selection,
@@ -336,8 +325,7 @@ function offsetPaginationHandler({ artifact, queryVariables: extraVariables, loa
             // set the loading state to true
             loading.set(true);
             // send the query
-            const { result, partial: partialData } = await executeQuery(artifact, queryVariables, sessionStore, false);
-            partial.set(partialData);
+            const result = await executeQuery(artifact, queryVariables, sessionStore, false);
             // update cache with the result
             cache.write({
                 selection: artifact.selection,

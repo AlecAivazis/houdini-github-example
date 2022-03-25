@@ -22,8 +22,6 @@ export function query(document) {
     const config = document.config.default || document.config;
     // a query is never 'loading'
     const loading = writable(false);
-    // track the partial state
-    let partial = writable(document.partial);
     // this payload has already been marshaled
     let variables = document.variables;
     // embed the variables in the components context
@@ -94,7 +92,6 @@ export function query(document) {
         data: { subscribe: store.subscribe },
         // the refetch function can be used to refetch queries possibly with new variables/arguments
         async refetch(newVariables) {
-            loading.set(true);
             try {
                 // Use the initial/previous variables
                 let variableBag = variables;
@@ -103,38 +100,29 @@ export function query(document) {
                     variableBag = { ...variableBag, ...newVariables };
                 }
                 // Execute the query
-                const { result, partial: partialData } = await executeQuery(artifact, variableBag, sessionStore, false);
-                partial.set(partialData);
+                const result = await executeQuery(artifact, variableBag, sessionStore, false);
                 // Write the data to the cache
                 writeData(result, variableBag);
             }
             catch (error) {
                 throw error;
             }
-            // track the loading state
-            loading.set(false);
         },
         // used primarily by the preprocessor to keep local state in sync with
         // the data given by preload
         writeData,
         loading: { subscribe: loading.subscribe },
-        partial: { subscribe: partial.subscribe },
         error: readable(null, () => { }),
-        onLoad(newValue) {
+        onLoad(newData, newVariables, source) {
             // we got new data from mounting, write it
-            writeData(newValue.result, newValue.variables);
+            writeData(newData, newVariables);
             // if we are mounting on a browser we might need to perform an additional network request
             if (isBrowser) {
                 // if the data was loaded from a cached value, and the document cache policy wants a
                 // network request to be sent after the data was loaded, load the data
-                if (newValue.source === DataSource.Cache &&
+                if (source === DataSource.Cache &&
                     artifact.policy === CachePolicy.CacheAndNetwork) {
                     // this will invoke pagination's refetch because of javascript's magic this binding
-                    this.refetch();
-                }
-                // if we have a partial result and we can load the rest of the data
-                // from the network, send the request
-                if (newValue.partial && artifact.policy === CachePolicy.CacheOrNetwork) {
                     this.refetch();
                 }
             }
@@ -207,16 +195,16 @@ export const componentQuery = ({ config, artifact, queryHandler, variableFunctio
             CachePolicy.CacheOrNetwork,
             CachePolicy.CacheOnly,
             CachePolicy.CacheAndNetwork,
-        ].includes(artifact.policy)) {
-            const cachedValue = cache.read({ selection: artifact.selection, variables });
-            // if there is something to write
-            if (cachedValue.data) {
-                writeData({
-                    data: cachedValue.data,
-                    errors: [],
-                }, variables);
-                cached = true;
-            }
+        ].includes(artifact.policy) &&
+            cache._internal_unstable.isDataAvailable(artifact.selection, variables)) {
+            writeData({
+                data: cache.read({
+                    selection: artifact.selection,
+                    variables,
+                }),
+                errors: [],
+            }, variables);
+            cached = true;
         }
         // there was no error while computing the variables
         else {

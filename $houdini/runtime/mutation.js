@@ -1,6 +1,7 @@
 // locals
 import { executeQuery } from './network';
 import cache from './cache';
+import { getVariables } from './context';
 import { marshalInputs, unmarshalSelection } from './scalars';
 // @ts-ignore: this file will get generated and does not exist in the source code
 import { getSession } from './adapter.mjs';
@@ -18,10 +19,11 @@ export function mutation(document) {
     const config = document.config.default || document.config;
     // grab the session from the adapter
     const sessionStore = getSession();
+    const queryVariables = getVariables();
     // return an async function that sends the mutation go the server
     return async (variables) => {
         try {
-            const { result } = await executeQuery(artifact, marshalInputs({
+            const result = await executeQuery(artifact, marshalInputs({
                 input: variables,
                 artifact: document.artifact,
                 config: config,

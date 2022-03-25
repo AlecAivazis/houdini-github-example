@@ -1,9 +1,9 @@
 export default {
     name: "AboutQuery",
     kind: "HoudiniQuery",
-    hash: "250498a5e709ff453767e4f2daa1f1f338358e4185254d6a93bd9d51c01432d5",
+    hash: "3898af13665183d7f88a4ffa557b1284d28267367ff4b4068fe2125cfea8ee23",
 
-    raw: `query AboutQuery($first: Int = 5, $after: String, $last: Int, $before: String) {
+    raw: `query AboutQuery($first: Int, $after: String, $last: Int, $before: String) {
   viewer {
     ...GhImg_user
     followers(first: $first, after: $after, last: $last, before: $before) {
@@ -62,8 +62,7 @@ fragment ButtonPagination_info on PageInfo {
 
                 name: {
                     type: "String",
-                    keyRaw: "name",
-                    nullable: true
+                    keyRaw: "name"
                 },
 
                 followers: {
@@ -74,13 +73,11 @@ fragment ButtonPagination_info on PageInfo {
                         edges: {
                             type: "UserEdge",
                             keyRaw: "edges",
-                            nullable: true,
 
                             fields: {
                                 node: {
                                     type: "User",
                                     keyRaw: "node",
-                                    nullable: true,
 
                                     fields: {
                                         id: {
@@ -100,8 +97,7 @@ fragment ButtonPagination_info on PageInfo {
 
                                         name: {
                                             type: "String",
-                                            keyRaw: "name",
-                                            nullable: true
+                                            keyRaw: "name"
                                         }
                                     }
                                 }
@@ -115,8 +111,7 @@ fragment ButtonPagination_info on PageInfo {
                             fields: {
                                 startCursor: {
                                     type: "String",
-                                    keyRaw: "startCursor",
-                                    nullable: true
+                                    keyRaw: "startCursor"
                                 },
 
                                 hasPreviousPage: {
@@ -131,8 +126,7 @@ fragment ButtonPagination_info on PageInfo {
 
                                 endCursor: {
                                     type: "String",
-                                    keyRaw: "endCursor",
-                                    nullable: true
+                                    keyRaw: "endCursor"
                                 }
                             }
                         },
