@@ -4,7 +4,7 @@
     import ButtonPagination  from '$lib/components/button-pagination.svelte'
 
     const { data, refetch, loading } = query<AboutQuery>(graphql`
-        query AboutQuery($first: Int = 5, $after: String, $last: Int, $before: String)
+        query AboutQuery($first: Int, $after: String, $last: Int, $before: String)
             @cache(policy: CacheOrNetwork) 
             { 
             viewer { 
