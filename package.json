@@ -21,7 +21,7 @@
 		"eslint": "^7.32.0",
 		"eslint-config-prettier": "^8.3.0",
 		"eslint-plugin-svelte3": "^3.2.1",
-		"houdini": "^0.13.2-alpha.2",
+		"houdini": "^0.13.2-alpha.3",
 		"houdini-preprocess": "^0.13.2-alpha.0",
 		"prettier": "^2.5.1",
 		"prettier-plugin-svelte": "^2.5.0",

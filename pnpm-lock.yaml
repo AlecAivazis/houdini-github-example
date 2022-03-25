@@ -9,7 +9,7 @@ specifiers:
   eslint: ^7.32.0
   eslint-config-prettier: ^8.3.0
   eslint-plugin-svelte3: ^3.2.1
-  houdini: ^0.13.2-alpha.2
+  houdini: ^0.13.2-alpha.3
   houdini-preprocess: ^0.13.2-alpha.0
   prettier: ^2.5.1
   prettier-plugin-svelte: ^2.5.0
@@ -31,7 +31,7 @@ devDependencies:
   eslint: 7.32.0
   eslint-config-prettier: 8.5.0_eslint@7.32.0
   eslint-plugin-svelte3: 3.4.1_eslint@7.32.0+svelte@3.46.4
-  houdini: 0.13.2-alpha.2
+  houdini: 0.13.2-alpha.3
   houdini-preprocess: 0.13.2-alpha.0
   prettier: 2.6.1
   prettier-plugin-svelte: 2.6.0_prettier@2.6.1+svelte@3.46.4
@@ -1307,8 +1307,8 @@ packages:
       - rollup
     dev: true
 
-  /houdini/0.13.2-alpha.2:
-    resolution: {integrity: sha512-NH4TG9WCzU7z0bDmjgvgHbcbt4L3k8OG2mkihlqtulIkRm8ZE+3LZ7gO+KLqAyR6F6722tnFp5i+hQIoF/dA8g==}
+  /houdini/0.13.2-alpha.3:
+    resolution: {integrity: sha512-GFmiE5CaSr621ymRMcUUAntE2U0Wu0lRJUXxSDEPQ2XsszDrGgPOqCypjVvy3LkeRj7V7lO5HsYF86SiOLXAUA==}
     engines: {node: '>=14.13'}
     hasBin: true
     dependencies:

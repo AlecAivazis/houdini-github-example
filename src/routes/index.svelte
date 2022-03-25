@@ -3,7 +3,7 @@
     import GhImg  from '$lib/components/gh-img.svelte'
     import ButtonPagination  from '$lib/components/button-pagination.svelte'
 
-    const { data, refetch } = query<AboutQuery>(graphql`
+    const { data, refetch, loading } = query<AboutQuery>(graphql`
         query AboutQuery($first: Int = 5, $after: String, $last: Int, $before: String)
             @cache(policy: CacheOrNetwork) 
             { 
@@ -26,6 +26,7 @@
             }
         }
     `)
+
 </script>
 
 <script context="module">
@@ -35,12 +36,6 @@
         }
     }
 </script>
-
-<h2>About page</h2>
-
-<p>Want to know more about KitQL?</p>
-
-<p>Go to check the doc: <a href="https://kitql.vercel.app/">https://kitql.vercel.app/</a></p>
 
 <!-- Me infos -->
 <div class="row">Me 👇</div>
@@ -57,9 +52,13 @@
 		on:paginate={(args) => refetch(args.detail)}
 	/>
 
-    {#each $data?.viewer.followers.edges ?? [] as edge}
-        <GhImg user={edge.node} />
-    {/each}
+	{#if $loading}
+		Loading...
+	{:else}
+        {#each $data?.viewer.followers.edges ?? [] as edge}
+            <GhImg user={edge.node} />
+        {/each}
+    {/if}
 
 	<ButtonPagination
 		type="after"
@@ -68,4 +67,15 @@
 	/>
 </div>
 
-    
+   
+<style>
+	.row {
+		margin-top: 40px;
+		margin-bottom: 40px;
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 20px;
+	}
+</style>
+ 
