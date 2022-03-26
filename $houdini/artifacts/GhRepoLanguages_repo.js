@@ -25,6 +25,7 @@ export default {
         languages: {
             type: "LanguageConnection",
             keyRaw: "languages(first: 2, orderBy: {field: SIZE, direction: DESC})",
+            nullable: true,
 
             fields: {
                 totalCount: {
@@ -35,6 +36,7 @@ export default {
                 edges: {
                     type: "LanguageEdge",
                     keyRaw: "edges",
+                    nullable: true,
 
                     fields: {
                         node: {
@@ -44,7 +46,8 @@ export default {
                             fields: {
                                 color: {
                                     type: "String",
-                                    keyRaw: "color"
+                                    keyRaw: "color",
+                                    nullable: true
                                 },
 
                                 id: {

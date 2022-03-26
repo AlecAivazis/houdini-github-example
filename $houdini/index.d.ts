@@ -3,7 +3,7 @@ export * from "./artifacts/GhImg_user";
 export * from "./artifacts/GhRepoLanguages_repo";
 export * from "./artifacts/GhStar_repo";
 export * from "./artifacts/AddStar";
+export * from "./artifacts/RemoveStar";
 export * from "./artifacts/UserBestRepo";
 export * from "./artifacts/AboutQuery";
-export * from "./artifacts/RemoveStar";
 export * from "./runtime";

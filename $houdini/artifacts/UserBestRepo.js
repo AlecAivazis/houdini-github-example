@@ -62,6 +62,7 @@ fragment GhStar_repo on Repository {
         user: {
             type: "User",
             keyRaw: "user(login: $login)",
+            nullable: true,
 
             fields: {
                 id: {
@@ -81,7 +82,8 @@ fragment GhStar_repo on Repository {
 
                 name: {
                     type: "String",
-                    keyRaw: "name"
+                    keyRaw: "name",
+                    nullable: true
                 },
 
                 repositories: {
@@ -92,6 +94,7 @@ fragment GhStar_repo on Repository {
                         nodes: {
                             type: "Repository",
                             keyRaw: "nodes",
+                            nullable: true,
 
                             fields: {
                                 id: {
@@ -106,12 +109,14 @@ fragment GhStar_repo on Repository {
 
                                 description: {
                                     type: "String",
-                                    keyRaw: "description"
+                                    keyRaw: "description",
+                                    nullable: true
                                 },
 
                                 languages: {
                                     type: "LanguageConnection",
                                     keyRaw: "languages(first: 2, orderBy: {field: SIZE, direction: DESC})",
+                                    nullable: true,
 
                                     fields: {
                                         totalCount: {
@@ -122,6 +127,7 @@ fragment GhStar_repo on Repository {
                                         edges: {
                                             type: "LanguageEdge",
                                             keyRaw: "edges",
+                                            nullable: true,
 
                                             fields: {
                                                 node: {
@@ -131,7 +137,8 @@ fragment GhStar_repo on Repository {
                                                     fields: {
                                                         color: {
                                                             type: "String",
-                                                            keyRaw: "color"
+                                                            keyRaw: "color",
+                                                            nullable: true
                                                         },
 
                                                         id: {

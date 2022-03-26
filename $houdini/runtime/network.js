@@ -4,7 +4,6 @@ import { get } from 'svelte/store';
 import { CachePolicy, DataSource, } from './types';
 import { marshalInputs } from './scalars';
 import cache from './cache';
-import { rootID } from './cache/cache';
 export class Environment {
     constructor(networkFn, subscriptionHandler) {
         this.fetch = networkFn;
@@ -39,7 +38,7 @@ export async function executeQuery(artifact, variables, sessionStore, cached) {
             query: new URLSearchParams(),
         },
     };
-    const [res] = await fetchQuery({
+    const { result: res, partial } = await fetchQuery({
         context: fetchCtx,
         artifact,
         session,
@@ -53,7 +52,7 @@ export async function executeQuery(artifact, variables, sessionStore, cached) {
     if (!res.data) {
         throw new Error('Encountered empty data response in payload');
     }
-    return res;
+    return { result: res, partial };
 }
 // convertKitPayload is responsible for taking the result of kit's load
 export async function convertKitPayload(context, loader, page, session) {
@@ -88,7 +87,11 @@ export async function fetchQuery({ context, artifact, variables, session, cached
     const environment = getEnvironment();
     // if there is no environment
     if (!environment) {
-        return [{ data: {}, errors: [{ message: 'could not find houdini environment' }] }, null];
+        return {
+            result: { data: {}, errors: [{ message: 'could not find houdini environment' }] },
+            source: null,
+            partial: false,
+        };
     }
     // enforce cache policies for queries
     if (cached && artifact.kind === 'HoudiniQuery') {
@@ -100,39 +103,40 @@ export async function fetchQuery({ context, artifact, variables, session, cached
         // cached data, we need to load data from the cache (if its available). If the policy
         // prefers network data we need to send a request (the onLoad of the component will
         // resolve the next data)
-        if ([
-            CachePolicy.CacheOrNetwork,
-            CachePolicy.CacheOnly,
-            CachePolicy.CacheAndNetwork,
-        ].includes(artifact.policy) &&
-            cache._internal_unstable.isDataAvailable(artifact.selection, variables)) {
-            return [
-                {
-                    data: cache.read({
-                        parent: rootID,
-                        selection: artifact.selection,
-                        variables,
-                    }),
-                    errors: [],
-                },
-                DataSource.Cache,
-            ];
-        }
-        // if the policy is cacheOnly and we got this far, we need to return null
-        else if (artifact.policy === CachePolicy.CacheOnly) {
-            return [
-                {
-                    data: null,
-                    errors: [],
-                },
-                null,
-            ];
+        // if the cache policy allows for cached data, look at the caches value first
+        if (artifact.policy !== CachePolicy.NetworkOnly) {
+            // look up the current value in the cache
+            const value = cache.read({ selection: artifact.selection, variables });
+            // if we have data, use that
+            if (value.data !== null) {
+                return {
+                    result: {
+                        data: value.data,
+                        errors: [],
+                    },
+                    source: DataSource.Cache,
+                    partial: value.partial,
+                };
+            }
+            // if the policy is cacheOnly and we got this far, we need to return null (no network request will be sent)
+            else if (artifact.policy === CachePolicy.CacheOnly) {
+                return {
+                    result: {
+                        data: null,
+                        errors: [],
+                    },
+                    source: DataSource.Cache,
+                    partial: false,
+                };
+            }
         }
     }
-    return [
-        await environment.sendRequest(context, { text: artifact.raw, hash: artifact.hash, variables }, session),
-        DataSource.Network,
-    ];
+    // the request must be resolved against the network
+    return {
+        result: await environment.sendRequest(context, { text: artifact.raw, hash: artifact.hash, variables }, session),
+        source: DataSource.Network,
+        partial: false,
+    };
 }
 export class RequestContext {
     constructor(ctx) {

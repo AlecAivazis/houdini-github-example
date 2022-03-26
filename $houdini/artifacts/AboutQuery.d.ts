@@ -27,8 +27,8 @@ export type AboutQuery$result = {
 };
 
 export type AboutQuery$input = {
-    first: number | null | undefined,
-    after: string | null | undefined,
-    last: number | null | undefined,
-    before: string | null | undefined
+    first?: number | null | undefined,
+    after?: string | null | undefined,
+    last?: number | null | undefined,
+    before?: string | null | undefined
 };

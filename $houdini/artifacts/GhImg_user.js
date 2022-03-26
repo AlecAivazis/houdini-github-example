@@ -31,7 +31,8 @@ export default {
 
         name: {
             type: "String",
-            keyRaw: "name"
+            keyRaw: "name",
+            nullable: true
         }
     }
 };

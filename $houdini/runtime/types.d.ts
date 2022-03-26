@@ -87,6 +87,7 @@ export declare type TaggedGraphqlQuery = {
     artifact: QueryArtifact;
     config: Config;
     source: DataSource;
+    partial: boolean;
 };
 declare type Filter = {
     [key: string]: string | boolean | number;
@@ -122,6 +123,7 @@ export declare type GraphQLValue = number | string | boolean | null | GraphQLObj
 export declare type SubscriptionSelection = {
     [field: string]: {
         type: string;
+        nullable?: boolean;
         keyRaw: string;
         operations?: MutationOperation[];
         list?: {

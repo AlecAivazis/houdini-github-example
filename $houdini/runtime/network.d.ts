@@ -65,15 +65,23 @@ export declare type RequestPayload<_Data = any> = {
     }[];
 };
 export declare type RequestHandler<_Data> = (this: FetchContext, params: FetchParams, session?: FetchSession) => Promise<RequestPayload<_Data>>;
-export declare function executeQuery<_Data extends GraphQLObject, _Input>(artifact: QueryArtifact | MutationArtifact, variables: _Input, sessionStore: Readable<any>, cached: boolean): Promise<RequestPayload>;
+export declare function executeQuery<_Data extends GraphQLObject, _Input>(artifact: QueryArtifact | MutationArtifact, variables: _Input, sessionStore: Readable<any>, cached: boolean): Promise<{
+    result: RequestPayload;
+    partial: boolean;
+}>;
 export declare function convertKitPayload(context: RequestContext, loader: (ctx: FetchContext) => Promise<KitLoadResponse>, page: FetchContext['page'], session: FetchContext['session']): Promise<Record<string, any>>;
+export declare type FetchQueryResult<_Data> = {
+    result: RequestPayload<_Data | {} | null>;
+    source: DataSource | null;
+    partial: boolean;
+};
 export declare function fetchQuery<_Data extends GraphQLObject>({ context, artifact, variables, session, cached, }: {
     context: FetchContext;
     artifact: QueryArtifact | MutationArtifact;
     variables: {};
     session?: FetchSession;
     cached?: boolean;
-}): Promise<[RequestPayload<_Data | {} | null>, DataSource | null]>;
+}): Promise<FetchQueryResult<_Data>>;
 export declare class RequestContext {
     context: FetchContext;
     continue: boolean;

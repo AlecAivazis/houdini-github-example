@@ -6,7 +6,7 @@
     import GhStar from '$lib/components/gh-star.svelte'
     import GhRepoLanguages from '$lib/components/gh-repo-languages.svelte'
 
-    const { data } = query<UserBestRepo>(graphql`
+    const { data, partial } = query<UserBestRepo>(graphql`
         query UserBestRepo($login: String!) @cache(policy: CacheOrNetwork) {
             user(login: $login) {
                 ...GhImg_user
@@ -31,7 +31,6 @@
         }
     `)
 
-    
 	async function dl() {
 		const canvas = await html2canvas(document.querySelector('#card'), {
 			backgroundColor: null,

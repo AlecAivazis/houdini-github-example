@@ -62,7 +62,8 @@ fragment ButtonPagination_info on PageInfo {
 
                 name: {
                     type: "String",
-                    keyRaw: "name"
+                    keyRaw: "name",
+                    nullable: true
                 },
 
                 followers: {
@@ -73,11 +74,13 @@ fragment ButtonPagination_info on PageInfo {
                         edges: {
                             type: "UserEdge",
                             keyRaw: "edges",
+                            nullable: true,
 
                             fields: {
                                 node: {
                                     type: "User",
                                     keyRaw: "node",
+                                    nullable: true,
 
                                     fields: {
                                         id: {
@@ -97,7 +100,8 @@ fragment ButtonPagination_info on PageInfo {
 
                                         name: {
                                             type: "String",
-                                            keyRaw: "name"
+                                            keyRaw: "name",
+                                            nullable: true
                                         }
                                     }
                                 }
@@ -111,7 +115,8 @@ fragment ButtonPagination_info on PageInfo {
                             fields: {
                                 startCursor: {
                                     type: "String",
-                                    keyRaw: "startCursor"
+                                    keyRaw: "startCursor",
+                                    nullable: true
                                 },
 
                                 hasPreviousPage: {
@@ -126,7 +131,8 @@ fragment ButtonPagination_info on PageInfo {
 
                                 endCursor: {
                                     type: "String",
-                                    keyRaw: "endCursor"
+                                    keyRaw: "endCursor",
+                                    nullable: true
                                 }
                             }
                         },

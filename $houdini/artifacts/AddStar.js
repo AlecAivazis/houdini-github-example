@@ -24,16 +24,19 @@ export default {
         addStar: {
             type: "AddStarPayload",
             keyRaw: "addStar(input: {starrableId: $id, clientMutationId: \"From KitQL\"})",
+            nullable: true,
 
             fields: {
                 clientMutationId: {
                     type: "String",
-                    keyRaw: "clientMutationId"
+                    keyRaw: "clientMutationId",
+                    nullable: true
                 },
 
                 starrable: {
                     type: "Starrable",
                     keyRaw: "starrable",
+                    nullable: true,
 
                     fields: {
                         id: {
