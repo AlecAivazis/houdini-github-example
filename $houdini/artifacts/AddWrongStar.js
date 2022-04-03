@@ -1,13 +1,13 @@
 export default {
-    name: "AddStar",
+    name: "AddWrongStar",
     kind: "HoudiniMutation",
-    hash: "f91c2046b40bd609ecb0377b332aefb94f16874ab9508af5b9d990fab533bbcc",
+    hash: "e405318124f302b372a8e5f662ea742b5b24d9d954736e4cba23cc539f544d81",
 
-    raw: `mutation AddStar($id: ID!) {
+    raw: `mutation AddWrongStar($id: ID!) {
   addStar(input: {starrableId: $id}) {
+    clientMutationId
     starrable {
       id
-      __typename
       stargazers {
         totalCount
       }
@@ -27,6 +27,12 @@ export default {
             nullable: true,
 
             fields: {
+                clientMutationId: {
+                    type: "String",
+                    keyRaw: "clientMutationId",
+                    nullable: true
+                },
+
                 starrable: {
                     type: "Starrable",
                     keyRaw: "starrable",
@@ -36,11 +42,6 @@ export default {
                         id: {
                             type: "ID",
                             keyRaw: "id"
-                        },
-
-                        __typename: {
-                            type: "String",
-                            keyRaw: "__typename"
                         },
 
                         stargazers: {
@@ -58,6 +59,11 @@ export default {
                         viewerHasStarred: {
                             type: "Boolean",
                             keyRaw: "viewerHasStarred"
+                        },
+
+                        __typename: {
+                            type: "String",
+                            keyRaw: "__typename"
                         }
                     },
 

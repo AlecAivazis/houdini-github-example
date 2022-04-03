@@ -23,6 +23,12 @@ export type UserBestRepo$result = {
     } | null
 };
 
+export type UserBestRepo$afterLoad = {
+    readonly "data": {
+        readonly "UserBestRepo": UserBestRepo$result
+    }
+};
+
 export type UserBestRepo$input = {
     login: string
 };

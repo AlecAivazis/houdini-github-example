@@ -105,7 +105,7 @@ class CacheInternal {
             this._disabled = true;
         }
     }
-    writeSelection({ data, selection, variables = {}, root = rootID, parent = rootID, applyUpdates = false, layer, toNotify = [], }) {
+    writeSelection({ data, selection, variables = {}, root = rootID, parent = rootID, applyUpdates = false, layer, forceNotify, toNotify = [], }) {
         var _a;
         // if the cache is disabled, dont do anything
         if (this._disabled) {
@@ -129,14 +129,14 @@ class CacheInternal {
             // look up the previous value
             const { value: previousValue, displayLayers } = this.storage.get(parent, key);
             // if the layer we are updating is the top most layer for the field
-            // then its value is "live", it is providing the current value and
+            // then its value is "live". It is providing the current value and
             // subscribers need to know if the value changed
-            const displayLayer = displayLayers.length === 0 || displayLayers.includes(layer.id);
+            const displayLayer = layer.isDisplayLayer(displayLayers);
             // if we are writing to the display layer we need to refresh the lifetime of the value
             if (displayLayer) {
                 this.lifetimes.resetLifetime(parent, key);
             }
-            // any non-scalar is defined as a field with no selection
+            // any scalar is defined as a field with no selection
             if (!fields) {
                 // the value to write to the layer
                 let newValue = value;
@@ -153,7 +153,7 @@ class CacheInternal {
                 }
                 // if the value changed on a layer that impacts the current latest value
                 const valueChanged = JSON.stringify(newValue) !== JSON.stringify(previousValue);
-                if (valueChanged && displayLayer) {
+                if ((valueChanged || forceNotify) && displayLayer) {
                     // we need to add the fields' subscribers to the set of callbacks
                     // we need to invoke
                     toNotify.push(...currentSubcribers);
@@ -199,7 +199,7 @@ class CacheInternal {
                 // write the link to the layer
                 layer.writeLink(parent, key, linkedID);
                 // if the link target of this field changed and it was responsible for the current subscription
-                if (linkedID && displayLayer && linkChange) {
+                if (linkedID && displayLayer && (linkChange || forceNotify)) {
                     // we need to clear the subscriptions in the previous link
                     // and add them to the new link
                     if (previousValue && typeof previousValue === 'string') {
@@ -346,7 +346,7 @@ class CacheInternal {
                 // is still valid would not be triggered
                 const contentChanged = JSON.stringify(linkedIDs) !== JSON.stringify(oldIDs);
                 // we need to look at the last time we saw each subscriber to check if they need to be added to the spec
-                if (contentChanged) {
+                if (contentChanged || forceNotify) {
                     toNotify.push(...currentSubcribers);
                 }
                 // any ids that don't show up in the new list need to have their subscribers wiped

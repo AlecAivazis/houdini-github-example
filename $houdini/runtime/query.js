@@ -123,6 +123,8 @@ export function query(document) {
         onLoad(newValue) {
             // we got new data from mounting, write it
             writeData(newValue.result, newValue.variables);
+            // keep the partial store in sync
+            partial.set(newValue.partial);
             // if we are mounting on a browser we might need to perform an additional network request
             if (isBrowser) {
                 // if the data was loaded from a cached value, and the document cache policy wants a

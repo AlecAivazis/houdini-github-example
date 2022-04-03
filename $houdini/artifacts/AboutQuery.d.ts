@@ -26,6 +26,12 @@ export type AboutQuery$result = {
     }
 };
 
+export type AboutQuery$afterLoad = {
+    readonly "data": {
+        readonly "AboutQuery": AboutQuery$result
+    }
+};
+
 export type AboutQuery$input = {
     first?: number | null | undefined,
     after?: string | null | undefined,

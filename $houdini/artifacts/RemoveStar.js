@@ -1,13 +1,13 @@
 export default {
     name: "RemoveStar",
     kind: "HoudiniMutation",
-    hash: "6cdc53e7c0ae0b92bf413cfa9ad10e2e8886c1ab8d9d566f3690d51feb24e0b5",
+    hash: "93ecb5d739710d68e090302a0f3b3af9029c7cf7a2b2322e368234b31dece6ce",
 
     raw: `mutation RemoveStar($id: ID!) {
-  removeStar(input: {starrableId: $id, clientMutationId: "From KitQL"}) {
-    clientMutationId
+  removeStar(input: {starrableId: $id}) {
     starrable {
       id
+      __typename
       stargazers {
         totalCount
       }
@@ -23,16 +23,10 @@ export default {
     selection: {
         removeStar: {
             type: "RemoveStarPayload",
-            keyRaw: "removeStar(input: {starrableId: $id, clientMutationId: \"From KitQL\"})",
+            keyRaw: "removeStar(input: {starrableId: $id})",
             nullable: true,
 
             fields: {
-                clientMutationId: {
-                    type: "String",
-                    keyRaw: "clientMutationId",
-                    nullable: true
-                },
-
                 starrable: {
                     type: "Starrable",
                     keyRaw: "starrable",
@@ -42,6 +36,11 @@ export default {
                         id: {
                             type: "ID",
                             keyRaw: "id"
+                        },
+
+                        __typename: {
+                            type: "String",
+                            keyRaw: "__typename"
                         },
 
                         stargazers: {
@@ -59,11 +58,6 @@ export default {
                         viewerHasStarred: {
                             type: "Boolean",
                             keyRaw: "viewerHasStarred"
-                        },
-
-                        __typename: {
-                            type: "String",
-                            keyRaw: "__typename"
                         }
                     },
 

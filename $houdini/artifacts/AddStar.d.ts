@@ -5,15 +5,21 @@ export type AddStar = {
 
 export type AddStar$result = {
     readonly addStar: {
-        readonly clientMutationId: string | null,
         readonly starrable: {
             readonly id: string,
+            readonly __typename: string | null,
             readonly stargazers: {
                 readonly totalCount: number
             },
             readonly viewerHasStarred: boolean
         } | null
     } | null
+};
+
+export type AddStar$afterLoad = {
+    readonly "data": {
+        readonly "AddStar": AddStar$result
+    }
 };
 
 export type AddStar$input = {

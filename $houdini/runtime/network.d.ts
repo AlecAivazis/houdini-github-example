@@ -75,6 +75,11 @@ export declare type FetchQueryResult<_Data> = {
     source: DataSource | null;
     partial: boolean;
 };
+export declare type QueryInputs<_Data> = FetchQueryResult<_Data> & {
+    variables: {
+        [key: string]: any;
+    };
+};
 export declare function fetchQuery<_Data extends GraphQLObject>({ context, artifact, variables, session, cached, }: {
     context: FetchContext;
     artifact: QueryArtifact | MutationArtifact;
@@ -87,20 +92,20 @@ export declare class RequestContext {
     continue: boolean;
     returnValue: {};
     constructor(ctx: FetchContext);
-    error(status: number, message: string | Error): void;
-    redirect(status: number, location: string): void;
+    error(status: number, message: string | Error): any;
+    redirect(status: number, location: string): any;
     fetch(input: RequestInfo, init?: RequestInit): any;
     graphqlErrors(payload: {
         errors?: GraphQLError[];
-    }): void;
-    invokeLoadHook({ variant, mode, hookFn, data, }: {
+    }): any;
+    invokeLoadHook({ variant, framework, hookFn, data, }: {
         variant: 'before' | 'after';
-        mode: 'kit' | 'sapper';
+        framework: 'kit' | 'sapper';
         hookFn: KitBeforeLoad | KitAfterLoad | SapperBeforeLoad | SapperAfterLoad;
         data: Record<string, any>;
     }): Promise<void>;
-    computeInput({ config, mode, variableFunction, artifact, }: {
-        mode: 'kit' | 'sapper';
+    computeInput({ config, framework, variableFunction, artifact, }: {
+        framework: 'kit' | 'sapper';
         variableFunction: SapperBeforeLoad | KitBeforeLoad;
         artifact: QueryArtifact | MutationArtifact | SubscriptionArtifact;
         config: Config;

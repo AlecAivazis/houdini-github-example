@@ -25,6 +25,7 @@ export declare enum ArtifactKind {
 export declare type QueryArtifact = BaseCompiledDocument & {
     kind: ArtifactKind.Query;
     policy?: CachePolicy;
+    partial?: boolean;
 };
 export declare type MutationArtifact = BaseCompiledDocument & {
     kind: ArtifactKind.Mutation;

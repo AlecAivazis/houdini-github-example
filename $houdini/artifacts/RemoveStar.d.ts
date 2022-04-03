@@ -5,15 +5,21 @@ export type RemoveStar = {
 
 export type RemoveStar$result = {
     readonly removeStar: {
-        readonly clientMutationId: string | null,
         readonly starrable: {
             readonly id: string,
+            readonly __typename: string | null,
             readonly stargazers: {
                 readonly totalCount: number
             },
             readonly viewerHasStarred: boolean
         } | null
     } | null
+};
+
+export type RemoveStar$afterLoad = {
+    readonly "data": {
+        readonly "RemoveStar": RemoveStar$result
+    }
 };
 
 export type RemoveStar$input = {

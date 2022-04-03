@@ -158,5 +158,6 @@ fragment ButtonPagination_info on PageInfo {
         types: {}
     },
 
-    policy: "CacheOrNetwork"
+    policy: "CacheOrNetwork",
+    partial: false
 };

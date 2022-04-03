@@ -1,5 +1,10 @@
 import type { Config } from 'houdini-common';
 import { MutationArtifact, QueryArtifact, SubscriptionArtifact, SubscriptionSelection } from './types';
+export declare function marshalSelection({ config, selection, data, }: {
+    config: Config;
+    selection: SubscriptionSelection;
+    data: unknown;
+}): {} | null | undefined;
 export declare function marshalInputs<T>({ artifact, config, input, rootType, }: {
     artifact: QueryArtifact | MutationArtifact | SubscriptionArtifact;
     config: Config;

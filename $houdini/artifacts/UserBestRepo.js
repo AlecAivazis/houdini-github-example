@@ -199,5 +199,6 @@ fragment GhStar_repo on Repository {
         types: {}
     },
 
-    policy: "CacheOrNetwork"
+    policy: "CacheOrNetwork",
+    partial: false
 };

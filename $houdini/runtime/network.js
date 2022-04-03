@@ -107,8 +107,10 @@ export async function fetchQuery({ context, artifact, variables, session, cached
         if (artifact.policy !== CachePolicy.NetworkOnly) {
             // look up the current value in the cache
             const value = cache.read({ selection: artifact.selection, variables });
-            // if we have data, use that
-            if (value.data !== null) {
+            // if the result is partial and we dont allow it, dont return the value
+            const allowed = !value.partial || artifact.partial;
+            // if we have data, use that unless its partial data and we dont allow that
+            if (value.data !== null && allowed) {
                 return {
                     result: {
                         data: value.data,
@@ -172,10 +174,10 @@ export class RequestContext {
     }
     // This hook fires before executing any queries, it allows to redirect/error based on session state for example
     // It also allows to return custom props that should be returned from the corresponding load function.
-    async invokeLoadHook({ variant, mode, hookFn, data, }) {
+    async invokeLoadHook({ variant, framework, hookFn, data, }) {
         // call the onLoad function to match the framework
         let hookCall;
-        if (mode === 'kit') {
+        if (framework === 'kit') {
             if (variant === 'before') {
                 hookCall = hookFn.call(this, this.context);
             }
@@ -209,9 +211,9 @@ export class RequestContext {
     // compute the inputs for an operation should reflect the framework's conventions.
     // in sapper, this means preparing a `this` for the function. for kit, we can just pass
     // the context
-    computeInput({ config, mode, variableFunction, artifact, }) {
+    computeInput({ config, framework, variableFunction, artifact, }) {
         // call the variable function to match the framework
-        let input = mode === 'kit'
+        let input = framework === 'kit'
             ? // in kit just pass the context directly
                 variableFunction.call(this, this.context)
             : // we are in sapper mode, so we need to prepare the function context

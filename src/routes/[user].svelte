@@ -6,7 +6,7 @@
     import GhStar from '$lib/components/gh-star.svelte'
     import GhRepoLanguages from '$lib/components/gh-repo-languages.svelte'
 
-    const { data, partial } = query<UserBestRepo>(graphql`
+    const { data } = query<UserBestRepo>(graphql`
         query UserBestRepo($login: String!) @cache(policy: CacheOrNetwork) {
             user(login: $login) {
                 ...GhImg_user
@@ -30,6 +30,40 @@
             }
         }
     `)
+
+    const mutate = mutation(graphql`
+        mutation AddWrongStar($id: ID!) {
+            addStar(input: { starrableId: $id }) {
+                clientMutationId
+                starrable {
+                    id
+                    stargazers {
+                        totalCount
+                    }
+                    viewerHasStarred
+                }
+            }
+        }
+    `)
+
+    const wrongUpdate = () => {
+        mutate({
+            id: $data.user.repositories.nodes[0].id 
+        }, { 
+            optimisticResponse: { 
+                addStar: { 
+                    starrable: { 
+                        id: $data.user.repositories.nodes[0].id,
+                        __typename: "Repository",
+                        stargazers: { 
+                            totalCount: 999
+                        },
+                        viewerHasStarred: false
+                    }
+                }
+            }
+        })
+    }
 
 	async function dl() {
 		const canvas = await html2canvas(document.querySelector('#card'), {
@@ -84,6 +118,9 @@
 </div>
 
 <div class="dlBtn">
+	<button on:click={wrongUpdate}
+		>Wrong Optimistic UI ADD</button
+	>
 	<button on:click={dl}>Download</button>
 </div>
 

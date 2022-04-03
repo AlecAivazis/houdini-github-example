@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { fragment, graphql, GhStar_repo, mutation } from '$houdini';
+    import { fragment, graphql, GhStar_repo, mutation, RemoveStar } from '$houdini';
 	import LogoStar from './logo-star.svelte';
 
 	export let repo: GhStar_repo ;
@@ -16,10 +16,10 @@
 
     const addStar = mutation(graphql`
         mutation AddStar($id: ID!) {
-            addStar(input: { starrableId: $id, clientMutationId: "From KitQL" }) {
-                clientMutationId
+            addStar(input: { starrableId: $id }) {
                 starrable {
                     id
+                    __typename
                     stargazers {
                         totalCount
                     }
@@ -29,12 +29,12 @@
         }
     `)
     
-    const removeStar = mutation(graphql`
+    const removeStar = mutation<RemoveStar>(graphql`
         mutation RemoveStar($id: ID!) {
-            removeStar(input: { starrableId: $id, clientMutationId: "From KitQL" }) {
-                clientMutationId
+            removeStar(input: { starrableId: $id }) {
                 starrable {
                     id
+                    __typename
                     stargazers {
                         totalCount
                     }
@@ -46,9 +46,35 @@
     
 	async function toggle() {
 		if ($data.viewerHasStarred) {
-            await removeStar({id: $data.id})
+            await removeStar({id: $data.id}, { 
+                optimisticResponse: { 
+                    removeStar: { 
+                        starrable: { 
+                            id: $data.id,
+                            __typename: "Repository",
+                            stargazers: { 
+                                totalCount: $data.stargazers.totalCount - 1
+                            },
+                            viewerHasStarred: false
+                        }
+                    }
+                }
+            })
         } else { 
-            await addStar({id: $data.id})
+            await addStar({id: $data.id}, { 
+                optimisticResponse: { 
+                    addStar: { 
+                        starrable: { 
+                            id: $data.id,
+                            __typename: "Repository",
+                            stargazers: { 
+                                totalCount: $data.stargazers.totalCount + 1
+                            },
+                            viewerHasStarred: true
+                        }
+                    }
+                }
+            })
         }
     }
 

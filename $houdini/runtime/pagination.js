@@ -21,12 +21,19 @@ export function paginatedQuery(document) {
         throw new Error('paginatedQuery must be passed a query with @paginate.');
     }
     // pass the artifact to the base query operation
-    const { data, loading, refetch, partial, ...restOfQueryResponse } = query(document);
+    const { data, loading, refetch, partial, onLoad, ...restOfQueryResponse } = query(document);
     const paginationPartial = writable(false);
-    const partialStore = derived([partial, paginationPartial], ([$partial, $paginationPartial]) => $partial || $paginationPartial);
+    partial.subscribe((val) => {
+        paginationPartial.set(val);
+    });
     return {
         data,
-        partial: partialStore,
+        partial: { subscribe: paginationPartial.subscribe },
+        onLoad(newValue) {
+            onLoad.call(this, newValue);
+            // keep the partial store in sync
+            paginationPartial.set(newValue.partial);
+        },
         ...paginationHandlers({
             initialValue: document.initialValue.data,
             store: data,
@@ -133,18 +140,17 @@ function paginationHandlers({ initialValue, artifact, store, queryVariables, doc
     return { loadNextPage, loadPreviousPage, pageInfo, loading, refetch: refetchQuery };
 }
 function cursorHandlers({ initialValue, artifact, store, queryVariables: extraVariables, loading, refetch, partial, }) {
+    var _a;
     // pull out the context accessors
     const variables = getVariables();
     const sessionStore = getSession();
     // track the current page info in an easy-to-reach store
-    const initialPageInfo = initialValue
-        ? extractPageInfo(initialValue, artifact.refetch.path)
-        : {
-            startCursor: null,
-            endCursor: null,
-            hasNextPage: false,
-            hasPreviousPage: false,
-        };
+    const initialPageInfo = (_a = extractPageInfo(initialValue, artifact.refetch.path)) !== null && _a !== void 0 ? _a : {
+        startCursor: null,
+        endCursor: null,
+        hasNextPage: false,
+        hasPreviousPage: false,
+    };
     const pageInfo = writable(initialPageInfo);
     // hold onto the current value
     let value = initialValue;
@@ -243,7 +249,8 @@ function cursorHandlers({ initialValue, artifact, store, queryVariables: extraVa
             }
             // we are updating the current set of items, count the number of items that currently exist
             // and ask for the full data set
-            const count = countPage(artifact.refetch.path.concat('edges'), value);
+            const count = countPage(artifact.refetch.path.concat('edges'), value) ||
+                artifact.refetch.pageSize;
             // build up the variables to pass to the query
             const queryVariables = {
                 ...variables(),

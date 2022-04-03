@@ -14,8 +14,9 @@ export declare class Cache {
         selection: SubscriptionSelection;
         variables?: {};
         parent?: string;
-        layer?: LayerID;
+        layer?: LayerID | null;
         applyUpdates?: boolean;
+        forceNotify?: boolean;
     }): LayerID;
     read(...args: Parameters<CacheInternal['getSelection']>): {
         data: GraphQLObject;
@@ -42,7 +43,7 @@ declare class CacheInternal {
         cache: Cache;
         lifetimes: GarbageCollector;
     });
-    writeSelection({ data, selection, variables, root, parent, applyUpdates, layer, toNotify, }: {
+    writeSelection({ data, selection, variables, root, parent, applyUpdates, layer, forceNotify, toNotify, }: {
         data: {
             [key: string]: GraphQLValue;
         };
@@ -55,6 +56,7 @@ declare class CacheInternal {
         layer: Layer;
         toNotify?: SubscriptionSpec[];
         applyUpdates?: boolean;
+        forceNotify?: boolean;
     }): SubscriptionSpec[];
     getSelection({ selection, parent, variables, }: {
         selection: SubscriptionSelection;
